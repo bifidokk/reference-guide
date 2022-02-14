@@ -76,7 +76,7 @@ class CloseTicketCommandHandler
     {
        $eventBus->publishWithRouting(
           "ticket.wasClosed", 
-          '{"ticketId": 123}'
+          '{"ticketId": 123}',
           "application/json"
        ); 
     }   
