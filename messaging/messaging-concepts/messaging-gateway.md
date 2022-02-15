@@ -94,6 +94,34 @@ Gateway may return values, but as you probably remember, everything is connected
 During [Message](message.md) building, gateway adds header `replyChannel` which contains automatically created Channel. During [Endpoint's method invocation](../conversion/method-invocation.md), if any value was returned it will be sent via reply Channel. \
 This way gateway may receive the reply and return it.&#x20;
 
+### Gateway reply Content Type
+
+If you have registered [Converter](../conversion/) for specific Media Type, then you can tell `Ecotone` to convert result of any [Gateway](messaging-gateway.md) to specific format. This is especially useful, when we are dealing with `QueryBus`, when we want to return the result to the caller of the request. \
+In order to do this, we need to make use of `Metadata`and `replyContentType` header.
+
+{% tabs %}
+{% tab title="" %}
+```php
+{
+   public function __construct(private QueryBus $queryBus)
+   {
+       $this->queryBus = $queryBus;   
+   }
+   
+   public function getTicketStatusAction(Request $request) : Response
+   {
+      return new Response(
+         $this->queryBus->sendWithMetadata(
+            new GetTicketStatusQuery($request->get("ticketId")),
+            ["replyContentType" => "application/json"]
+         );
+      )    
+   }
+}
+```
+{% endtab %}
+{% endtabs %}
+
 ### Parameters to Message Conversion
 
 In order to build [Message](message.md),  Parameter Converters are introduced. \
