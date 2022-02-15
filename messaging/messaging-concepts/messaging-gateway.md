@@ -6,9 +6,17 @@ description: Message Gateway PHP
 
 ![](../../.gitbook/assets/gateway\_execution.svg)
 
-The Messaging Gateway encapsulates messaging-specific code (The code required to send or receive a [Message](message.md)) and separates it from the rest of the application code.\
-It does build from domain specific objects a [Message](message.md) that is send via [Message channel.](message-channel.md) \
-To not have dependency on the _Ecotone API_ — including the gateway class, _Ecotone_ provides the Gateway as interface. Framework generates a proxy for any interface and internally invokes the gateway methods. By using dependency injection, you can then expose the interface to your business methods.
+The Messaging Gateway encapsulates messaging-specific code (The code required to send or receive a [Message](message.md)) and separates it from the rest of the application code.
+
+It takes Application specific data and convert it [Message](message.md) which then is sent via [Message channel.](message-channel.md) \
+This hide Messaging specific code, from user's code.&#x20;
+
+{% hint style="info" %}
+Command/Query/Event Buses are implementations of Messaging Gateways.
+{% endhint %}
+
+Ecotone aims for eliminating Framework related code from Business related code, that's why Gateway can defined as interface in user's code base. \
+Ecotone is responsible for generating implementation for any interface.&#x20;
 
 ### Implementing own Gateway
 
@@ -25,7 +33,7 @@ interface ProductGateway
 }
 ```
 
-1. By default gateway will be available under interface name, in that case `Product\ProductGateway.`\
+1. By default gateway will be available under interface name in DI, in that case `Product\ProductGateway.`\
    If you want to register it under different name for example "productGateway", then pass it to annotation `#[ClassReference("productGateway")]`
 
 {% tabs %}
@@ -48,6 +56,32 @@ $productGateway = $messagingSystem->getGatewayByName(ProductGateway::class);
 {% endtabs %}
 
 &#x20; 2\. `Gateway` enables method to be used as Messaging Gateway. You may have multiple Gateways defined within interface.
+
+### Building your own Bus
+
+Using combination of Messaging Gateway and [Router](message-endpoint/message-routing.md) we can build our own Buses. \
+Messaging Gateway will be responsible for building Message and sending to the Router. \
+And Router will be then based on need route it by payload / headers or whatever is needed.
+
+### Invoking Handler directly
+
+In some cases you may want to invoke Query/Command Handler directly, not via Bus. \
+In that case you may define Message Gateway that routes to given Handler.
+
+```php
+interface OrderGateway {
+    #[Gateway("placeOrder")] 
+    public function placeOrder(string $order): void;
+}
+
+class OrderService {
+    #[CommandHandler("placeOrder")]
+    public function makeOrder(string $order)
+    {
+        // make order
+    }
+}
+```
 
 ### Gateway reply
 
