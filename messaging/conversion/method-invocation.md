@@ -121,7 +121,7 @@ It contains attributes:
 
     &#x20;
 
-#### Expression
+### Expression
 
 Besides three types of variables available within expression just as with `Payload Expression`, there is one more variable available `value.` Value holds chosen header by `headerName` attribute.
 

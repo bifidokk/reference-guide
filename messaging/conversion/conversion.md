@@ -84,10 +84,6 @@ Converter that `matches` JSON to PHP conversion will be used to do the conversio
     }
 ```
 
-## Conversion on fly using Asynchronous Endpoints
-
-There may be situations when you will want to decouple your own applications&#x20;
-
 ## How to build your own Media Type Converter
 
 If we would like to implement `JSON to PHP` converter, we could start like this:
