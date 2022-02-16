@@ -4,15 +4,23 @@ description: Conversion PHP
 
 # Conversion
 
-Command, queries and events are not always objects. When they travel via different channels, coming from outside, they are mostly converted to simplified format, like `JSON` or `XML`.  \
+Command, queries and events are not always objects. \
+When they travel via different channels, coming from outside, they are mostly converted to simplified format, like `JSON` or `XML`.  \
 At the level of application however we want to deal with it in `PHP` format, as objects or arrays , so we can understand what are we dealing with.
 
 Moving from one format to another requires conversion. `Ecotone` does it automatically using [Media Type](https://pl.wikipedia.org/wiki/Typ\_MIME) Converters. \
-`Media Type Converters` are responisble for converting data into expected format. It can be from `JSON to PHP`, but it also can be other way around from `PHP to JSON`.
+`Media Type Converters` are responsible for converting data into expected format. It can be for example from `JSON to PHP`, but it also can be other way around from `PHP to JSON`.
+
+## Available Media Type Converters
+
+Ecotone comes with configured Media Type Converters, if you don't want to build your own.
+
+* [JMS Converter](../../modules/jms-converter.md)
 
 ## Media Type Converter
 
-We need to define class for it which implements `Converter` and is marked by annotation `@MediaTypeConverter.` &#x20;
+We need to define class for it which implements `Converter` and is marked by annotation \
+\#\[`MediaTypeConverter].` &#x20;
 
 ```php
 #[MediaTypeConverter] 
@@ -38,12 +46,12 @@ There are two methods `matches` and `convert.` \
 2. `MediaType` - Describes expected Media Type format. This can be `application/json`, `application/xml` or `application/x-php` etc.&#x20;
 3. `$source` - is the actual data to be converted.&#x20;
 
-### How does it apply to actual endpoint execution
+## Conversion on fly using Routed Messages
 
 Suppose we have `Command Handler` endpoint, which expects `PlaceOrderCommand` class.
 
 ```php
-#[CommandHandler]
+#[CommandHandler("order.place")]
 public function placeOrder(PlaceOrderCommand $command)
 {
    // do something
@@ -61,9 +69,9 @@ $this->commandBus->sendWithRouting(
 ```
 
 `Ecotone`does delay the conversion to the time, when it's actually needed. In that case it will be just before `placeOrder` method will be called. \
-Then right before execution `Ecotone` will resolve, that Payload of [Message](../messaging-concepts/message.md), which will be `{"productIds": [1,2]}` and it's content Type `application/json` differs from the expected type, which is `PlaceOrderCommand` and content Type `application/x-php` (default for PHP types).&#x20;
+Then Payload of [Message](../messaging-concepts/message.md), which will be `{"productIds": [1,2]}` with content Type `application/json` will be converted to `PlaceOrderCommand` and content Type `application/x-php` (default for PHP types).&#x20;
 
-It's converter that `matches` JSON to PHP conversion will be used to do the conversion:
+Converter that `matches` JSON to PHP conversion will be used to do the conversion:
 
 ```php
     public function convert($source, TypeDescriptor $sourceType, MediaType $sourceMediaType, TypeDescriptor $targetType, MediaType $targetMediaType)
@@ -75,6 +83,10 @@ It's converter that `matches` JSON to PHP conversion will be used to do the conv
        // $targetMediaType - application/x-php
     }
 ```
+
+## Conversion on fly using Asynchronous Endpoints
+
+There may be situations when you will want to decouple your own applications&#x20;
 
 ## How to build your own Media Type Converter
 
@@ -98,9 +110,9 @@ public function convert($source, TypeDescriptor $sourceType, MediaType $sourceMe
 }
 ```
 
-## Conversions on PHP Level
+## PHP to PHP Conversions
 
-`Ecotone` does come with simplication for PHP level conversion. Suppose we want to send Query as scalar type.&#x20;
+`Ecotone` does come with simplication for PHP level conversion. Suppose we want to send Query with scalar string type: `"61cfc7ea-928f-420f-a8e1-656ae2968254"` and convert it to `Uuid` on receiving side.
 
 ```php
 $this->queryBus->sendWithRouting(
@@ -122,7 +134,7 @@ public function getOrderDetails(Uuid $orderId)
 As you can see `query` neither, `command` needs to be class. It can be simple array or even a scalar, it's really up to the developer, what does fit best for him in given scenario.&#x20;
 {% endhint %}
 
-Let's add PHP Conversion:e
+Let's add PHP Conversion:
 
 ```php
 class ExampleConverterService
@@ -135,8 +147,7 @@ class ExampleConverterService
 }
 ```
 
-`Ecotone`will read parameter type, which is `string` and return type, which is `Uuid.` \
-Based on that fact, converter from `string` to `Uuid` will be registered and our query handler will be called with success.\
+`Ecotone`will read parameter type of `Converter`, which is `string` and return type which is `Uuid` and such Converter will be registered.\
 \
 Conversion does work with more complicated objects, expecting more than one parameter.\
 In that case array can be used in order to construct the object.
@@ -177,8 +188,7 @@ public function getOrders(array $orderIds)
 
 In order to handle such conversion, we do not need to do anything more. We have converter for `string to UUID` then it will be automatically used in order to handle array of string for UUID conversion.\
 \
-`Ecotone` does know that parameter `array $orderIds`is array of UUIDs based on docblock parameter\
-`@param Uuid[] $orderIds.`&#x20;
+`Ecotone` does know that parameter `$orderIds`is array of UUIDs based on docblock parameter`@param Uuid[]` $orderIds`.`&#x20;
 
 ## Serializer
 
@@ -210,6 +220,6 @@ $this->serializer->convertFromPHP([1,2,3], "application/json")
 $this->serializer->convertToPHP('{"productId": 1}', "application/json", OrderProduct:class)
 ```
 
-### Injecting Serializer
-
-As Serializer is `Gateway` it will be automatically registered in your Dependency Container, under class name.
+{% hint style="info" %}
+As Serializer`Gateway` will be automatically registered in your Dependency Container.
+{% endhint %}
