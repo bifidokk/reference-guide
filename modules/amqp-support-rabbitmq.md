@@ -137,7 +137,7 @@ class AMQPConfiguration
     {
         return 
             AmqpMessagePublisherConfiguration::create(
-                Publisher::class, // 1
+                MessagePublisher::class, // 1
                 "delivery", // 2
                 "application/json" // 3
             );
@@ -151,11 +151,11 @@ class AMQPConfiguration
 
 Publisher is a special type of [Gateway](../messaging/messaging-concepts/messaging-gateway.md), which implements [Publisher interface](amqp-support-rabbitmq.md#available-actions).\
 It will be available in your Dependency Container under passed `Reference name.`\
-In case interface name `Publisher:class` is used, it will be available using auto-wire.
+In case interface name `MessagePublisher:class` is used, it will be available using auto-wire.
 
 ```php
 #[EventHandler] 
-public function whenOrderWasPlaced(OrderWasPlaced $event, Publisher $publisher) : void
+public function whenOrderWasPlaced(OrderWasPlaced $event, MessagePublisher $publisher) : void
 {
     $publisher->convertAndSendWithMetadata(
         $event,
@@ -169,8 +169,8 @@ public function whenOrderWasPlaced(OrderWasPlaced $event, Publisher $publisher) 
 ### Additional Publisher Configuration
 
 ```php
-RegisterAmqpPublisher::create(
-    Publisher::class,
+AmqpMessagePublisherConfiguration::create(
+    MessagePublisher::class,
     "delivery"
 )
     ->withDefaultPersistentDelivery(true) // 1
@@ -198,6 +198,7 @@ class AmqpConfiguration
             AmqpQueue::createWith("orders"), // 1
             AmqpExchange::createDirectExchange("system"), // 2
             AmqpBinding::createFromNames("system", "orders", "placeOrder"), // 3
+            AmqpMessageConsumerConfiguration::create("consumer", "orders") // 4
         ];
     }
 }
@@ -206,17 +207,14 @@ class AmqpConfiguration
 1. `AmqpQueue::createWith(string $name)` - Registers Queue with specific name
 2. `AmqpExchange::create*(string $name)` - Registers of given type with specific name
 3. `AmqpBinding::createFromName(string $exchangeName, string $queueName, string $routingKey)`- Registering binding between exchange and queue
+4. Provides Consumer that will be registered at given name `"consumer"` and will be polling `"orders"` queue
 
 When we do have registered configuration, we can register Consumer for specific queue.
 
 ```php
 class Consumer
 {
-    #[AmqpChannelAdapter(
-        endpointId: "amqp_consumer",  // 1
-        queueName: "queue_name",  // 2
-        headerMapper: "application.*" // 3 
-    )] 
+    #[MessageConsumer("consumer")]
     public function execute(string $message) : void
     {
         // do something with Message
@@ -224,20 +222,6 @@ class Consumer
     }
 }
 ```
-
-1. `endpointId` - Defines identifier for this consumer. It will be available under this name to run
-
-```php
-ecotone:list
-+--------------------+
-| Endpoint Names     |
-+--------------------+
-| amqp_consumer      |
-+--------------------+
-```
-
-&#x20; 2\. `queueName` - The queue name which will be polled by this consumer\
-&#x20; 3\. `headerMapper` - Headers which should be mapped to [Message](../messaging/messaging-concepts/message.md)&#x20;
 
 ## Publisher Transactions
 
