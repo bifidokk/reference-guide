@@ -10,24 +10,6 @@ Aggregate need to be loaded in order to call method on it. \
 Normally the flow for calling aggregate method, would looks like below. Which involves having handling service with access to repository.
 
 ```php
-class AssignWorkerCommmand
-{
-    private string $ticketId;
-    
-    private string $workerId;
-    
-    public function getTicketId() : string;
-    {
-       return $this->ticketId;
-    }
-    
-    public function getWorkerId() : string
-    {
-       return $this->workerId;
-    }
-}
-
-
 class CloseTicketHandler
 {
     private TicketRepository $ticketRepository;
@@ -52,6 +34,17 @@ class Ticket
 
 _Ecotone_ provides possibility to mark Ticket Aggregate [methods as `CommandHandler` directly.](state-stored-aggregate.md) \
 In that situation, Ecotone retrievies identifiers from Command message, pass them to `Repository`, calls the method on aggregate instance and saves it. In short it does code from `CreateTicketCommand Handler` for you.&#x20;
+
+```php
+class Ticket
+{
+    #[CommandHandler]
+    public function assignWorker(string $workerId)
+    {
+       // do something with assignation
+    }
+}
+```
 
 {% hint style="info" %}
 As Ecotone does not try to impose specific solutions, you are free to choose, which fits you best in specific context. Above example is based on [External Command Handlers](external-command-handlers.md).
