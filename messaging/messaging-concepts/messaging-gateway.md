@@ -68,18 +68,50 @@ And Router will be then based on need route it by payload / headers or whatever 
 In some cases you may want to invoke Query/Command Handler directly, not via Bus. \
 In that case you may define Message Gateway that routes to given Handler.
 
-```php
-interface OrderGateway {
-    #[Gateway("placeOrder")] 
-    public function placeOrder(string $order): void;
-}
+**Aggregate:**
 
+```php
 class OrderService {
     #[CommandHandler("placeOrder")]
     public function makeOrder(string $order)
     {
         // make order
     }
+}
+```
+
+**Gateway:**
+
+```php
+interface OrderGateway {
+    #[Gateway("placeOrder")] 
+    public function placeOrder(string $order): void;
+}
+```
+
+### Invoking Aggregate's Handler directly
+
+You may expose Aggregate's Command and Query Handlers through interface.&#x20;
+
+**Aggregate:**
+
+```php
+#[Aggregate]
+class Order {
+    #[CommandHandler("cancelOrder")]
+    public function makeOrder(CancelOrder $command)
+    {
+        // do something
+    }
+}
+```
+
+**Gateway:**
+
+```php
+interface OrderGateway {
+    #[Gateway("cancelOrder")] 
+    public function placeOrder(#[AggregateIdentifier] string $orderId, #[Payload] CancelOrder $command)): void;
 }
 ```
 
