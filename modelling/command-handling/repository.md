@@ -63,23 +63,21 @@ To get more details how to implement _Aggregate,_ go to previous pages:
 [state-stored-aggregate.md](state-stored-aggregate.md)
 {% endcontent-ref %}
 
-{% content-ref url="broken-reference" %}
-[Broken link](broken-reference)
+{% content-ref url="event-sourcing-aggregate.md" %}
+[event-sourcing-aggregate.md](event-sourcing-aggregate.md)
 {% endcontent-ref %}
 
-### How to implement Repository
+## How to implement Repository
 
 There are two types of repositories. One for storing [`State-Stored Aggregate`](state-stored-aggregate.md) and another one for storing [`Event Sourcing Aggregate`](broken-reference).
 
 Based on which interface is implemented, `Ecotone` knows which Aggregate type was selected.\
 The interface informs, if specific `Repository` can handle given `Aggregate class.`\
-You may implement&#x20;
+You may implement:&#x20;
 
-#### Repository for State-Stored Aggregate
+### Repository for State-Stored Aggregate
 
 ```php
-namespace Ecotone\Modelling;
-
 interface StandardRepository
 {
     
@@ -102,11 +100,9 @@ interface StandardRepository
 * `$metadata` is array of extra information, that can be passed with Command
 * `$expectedVersion` if version locking by `@Version` is enabled it will carry currently expected version
 
-#### Repository for Event Sourced Aggregate
+### Repository for Event Sourced Aggregate
 
 ```php
-namespace Ecotone\Modelling;
-
 interface EventSourcedRepository
 {
     public function canHandle(string $aggregateClassName): bool;
@@ -121,3 +117,61 @@ Event Sourced Repository  instead of working with aggregate instance, works with
 
 1. `findBy method` returns previously created events for given aggregate.&#x20;
 2. `save method` gets array of events to save returned by `CommandHandler` after performing an action
+
+### Set up your own Implementation
+
+When your implementation is ready simply mark it with `#[Repository]` attribute:
+
+```php
+#[Repository]
+class DoctrineRepository implements StandardRepository
+{
+    // implemented methods
+}
+```
+
+### Own Repository Interface
+
+If you want to make use of Repositories directly in your code and want to avoid using above implementation, you may create Interface to decouple from the the Framework completely. \
+We are doing it by marking method with `#[Repository]`.
+
+#### For State-Stored Aggregate
+
+```php
+interface OrderRepository
+{
+    #[Repository]
+    public function getOrder(string $twitId): Order;
+
+    #[Repository]
+    public function findOrder(string $twitId): ?Order;
+
+    #[Repository]
+    public function save(Twitter $twitter): void;
+}
+```
+
+Ecotone will read type hint to understand, which Aggregate you would like to fetch or save.
+
+{% hint style="info" %}
+Implementation will be delivered by Framework. All you need to do is to define the interface and it's available to use in your Dependency Container
+{% endhint %}
+
+#### For Event Sourced Aggregate
+
+```php
+interface OrderRepository
+{
+    #[Repository]
+    public function getOrder(string $twitId): Order;
+
+    #[Repository]
+    public function findOrder(string $twitId): ?Order;
+
+    #[Repository]
+    #[RelatedAggregate(Order::class)]
+    public function save(string $aggregateId, int $currentVersion, array $events): void;
+}
+```
+
+The difference is in `save` method, you need to provide `aggregate id, current aggregate's version and array of events` you would like to store.
