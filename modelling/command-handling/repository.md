@@ -18,14 +18,14 @@ class CloseTicketHandler
     public function handle(CreateTicketCommand $command) : void
     {
        $ticket = $this->ticketRepository->findBy($command->getTicketId());
-       $ticket->assignWorker($command->getWorkerId());
+       $ticket->assignWorker($command);
        $this->ticketRepository->save($ticket);    
     }
 }
 
 class Ticket
 {
-    public function assignWorker(string $workerId)
+    public function assignWorker(CreateTicketCommand $command)
     {
        // do something with assignation
     }
@@ -39,7 +39,7 @@ In that situation, Ecotone retrievies identifiers from Command message, pass the
 class Ticket
 {
     #[CommandHandler]
-    public function assignWorker(string $workerId)
+    public function assignWorker(CreateTicketCommand $command)
     {
        // do something with assignation
     }
