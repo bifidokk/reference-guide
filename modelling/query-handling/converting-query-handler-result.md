@@ -4,7 +4,7 @@ description: Query Result PHP
 
 # Converting Query Handler Result
 
-If you have registered [Converter](../../messaging/conversion/) for specific Media Type, then you can tell `Ecotone` to convert result of any [Gateway](../../messaging/messaging-concepts/messaging-gateway.md) to specific format. This is especially useful, when we are dealing with `QueryBus`, when we want to return the result to the caller of the request.   
+If you have registered [Converter](../../messaging/conversion/) for specific Media Type, then you can tell `Ecotone` to convert result of any [Gateway](../../messaging/messaging-concepts/messaging-gateway.md) to specific format. This is especially useful, when we are dealing with `QueryBus`, when we want to return the result to the caller of the request. \
 In order to do this, we need to make use of `Metadata`and `replyContentType` header.
 
 {% tabs %}
@@ -24,7 +24,7 @@ class TicketController
       return new Response(
          $this->queryBus->sendWithMetadata(
             new GetTicketStatusQuery($request->get("ticketId")),
-            ["replyContentType" => "application/json"]
+            expectedReturnedMediaType: "application/json"
          );
       )    
    }
@@ -34,12 +34,12 @@ class TicketController
 
 {% tab title="Lite" %}
 ```php
-$queryBus = $messagingSystem->getGatewayByName(QueryBus::class);
+$queryBus = $messagingSystem->getQueryBus();
 
 // result will be in json
 $result = $queryBus->sendWithMetadata(
-             new GetTicketStatusQuery($ticketId), 
-             ["replyContentType" => "application/json"]
+             new GetTicketStatusQuery($ticketId),
+             expectedReturnedMediaType: "application/json"
           );
 ```
 {% endtab %}
@@ -59,4 +59,3 @@ class GetTicketStatusQueryHandler
 ```
 {% endtab %}
 {% endtabs %}
-
