@@ -101,6 +101,19 @@ Otherwise you will need to tell Message Channel, Transactions the name of Connec
 {% endtab %}
 {% endtabs %}
 
+## Doctrine ORM Support
+
+If you have set up [Manager Registry Connection](dbal-support.md#using-manager-registry), you may enable support for Doctrine ORM Repositories.
+
+```php
+    #[ServiceContext]
+    public function getDbalConfiguration(): DbalConfiguration
+    {
+        return DbalConfiguration::createWithDefaults()
+            ->withDoctrineORMRepositories(true);
+    }
+```
+
 ## Message Channel
 
 To create Dbal Backed [Message Channel](../modelling/asynchronous-handling.md), we need to create [Service Context](../messaging/service-application-configuration.md).&#x20;

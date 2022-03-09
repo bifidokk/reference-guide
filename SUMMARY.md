@@ -7,6 +7,7 @@
   * [Event Handling PHP](quick-start-php-ddd-cqrs-event-sourcing/php-event-handling.md)
   * [Asynchronous PHP](quick-start-php-ddd-cqrs-event-sourcing/asynchronous-php.md)
   * [Event Sourcing PHP](quick-start-php-ddd-cqrs-event-sourcing/event-sourcing-php.md)
+  * [Doctrine ORM](quick-start-php-ddd-cqrs-event-sourcing/doctrine-orm.md)
   * [Microservices PHP](quick-start-php-ddd-cqrs-event-sourcing/microservices-php.md)
 * [Tutorial](tutorial-php-ddd-cqrs-event-sourcing/README.md)
   * [Before we start tutorial](tutorial-php-ddd-cqrs-event-sourcing/before-we-start-tutorial.md)
