@@ -4,29 +4,25 @@ description: Scheduling PHP
 
 # Scheduling
 
-## Scheduled Rate/Cron
+`Ecotone` comes with support for running `period tasks` or `cron jobs.`
 
-`Ecotone` comes with support for running `period tasks` or `cron jobs` using `Scheduled.`\
-`Scheduled` creates [Message](../messaging/messaging-concepts/message.md) from given method and send it to `requestChannelName`.
+## Scheduled Method
 
 ```php
-class CurrencyExchanger
+class NotificationService
 {
-    #[Scheduled(requestChannelName: "exchange", endpointId: "currencyExchanger")] 
-    #[Poller(fixedRateInMilliseconds=1000)]
-    public function callExchange() : array
+    #[Scheduled(endpointId: "notificationSender")]
+    #[Poller(fixedRateInMilliseconds: 1000)]
+    public function sendNotifications(): void
     {
-        return ["currency" => "EUR", "ratio" => 1.23];
+        echo "Sending notifications...\n";
     }
 }
-
-#[CommandHandler("exchange")] 
-public function exchange(ExchangeCommand $command) : void;
 ```
 
-`endpointId` - `Scheduled` requires defined `endpointId,` it will be used in order to run Adapter. \
-`requestChannelName` - The channel name to which [Message](../messaging/messaging-concepts/message.md) should be send\
-`poller` - Configuration how to execute Inbound Channel Adapter, [read more in next section](scheduling.md#polling-metadata). This configuration tells `Ecotone` to execute Channel Adapter every second.
+`endpointId` - it's name which identifies process to run\
+`poller` - Configuration how to execute this method [read more in next section](scheduling.md#polling-metadata). \
+Above configuration tells `Ecotone` to execute this method every second.
 
 {% tabs %}
 {% tab title="Symfony" %}
@@ -35,7 +31,7 @@ console ecotone:list
 +--------------------+
 | Endpoint Names     |
 +--------------------+
-| currencyExchanger  |
+| notificationSender |
 +--------------------+
 ```
 {% endtab %}
@@ -46,7 +42,7 @@ artisan ecotone:list
 +--------------------+
 | Endpoint Names     |
 +--------------------+
-| currencyExchanger  |
+| notificationSender |
 +--------------------+
 ```
 {% endtab %}
@@ -63,23 +59,43 @@ After setting up Scheduled endpoint we can run the endpoint:
 {% tabs %}
 {% tab title="Symfony" %}
 ```php
-console ecotone:run currencyExchanger -vvv
+console ecotone:run notificationSender -vvv
 ```
 {% endtab %}
 
 {% tab title="Laravel" %}
 ```
-artisan ecotone:run currencyExchanger -vvv
+artisan ecotone:run notificationSender -vvv
 ```
 {% endtab %}
 
 {% tab title="Lite" %}
 ```php
-$messagingSystem->run("currencyExchanger");
+$messagingSystem->run("notificationSender");
 ```
 {% endtab %}
 {% endtabs %}
 
-After running`currencyExchanger` endpoint it will poll message from `callExchange`and call  Command Handler `exchange`with array payload  `["currency" => "EUR", "ratio" => 1.23]`.&#x20;
+## Scheduled Handler
+
+You can run `Scheduled` for given Handler.\
+Right now method return [Message](../messaging/messaging-concepts/message.md) which is send to given routing.
+
+```php
+class CurrencyExchanger
+{
+    #[Scheduled(requestChannelName: "exchange", endpointId: "currencyExchanger")] 
+    #[Poller(fixedRateInMilliseconds=1000)]
+    public function callExchange() : array
+    {
+        return ["currency" => "EUR", "ratio" => 1.23];
+    }
+}
+
+#[CommandHandler("exchange")] 
+public function exchange(ExchangeCommand $command) : void;
+```
+
+`requestChannelName` - The channel name to which [Message](../messaging/messaging-concepts/message.md) should be send.
 
 When the Message will arrive on the Command Handler it will be automatically converted to `ExchangeCommand.` If you want to understand how the conversion works, you may read about it in [Conversion section](../messaging/conversion/).
