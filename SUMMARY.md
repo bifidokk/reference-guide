@@ -5,7 +5,7 @@
 * [Quick Start - DDD CQRS PHP](quick-start-php-ddd-cqrs-event-sourcing/README.md)
   * [CQRS PHP](quick-start-php-ddd-cqrs-event-sourcing/php-cqrs.md)
   * [Event Handling PHP](quick-start-php-ddd-cqrs-event-sourcing/php-event-handling.md)
-  * [Scheduling](quick-start-php-ddd-cqrs-event-sourcing/scheduling.md)
+  * [Scheduling in PHP](quick-start-php-ddd-cqrs-event-sourcing/scheduling-in-php.md)
   * [Doctrine ORM](quick-start-php-ddd-cqrs-event-sourcing/doctrine-orm.md)
   * [Asynchronous PHP](quick-start-php-ddd-cqrs-event-sourcing/asynchronous-php.md)
   * [Event Sourcing PHP](quick-start-php-ddd-cqrs-event-sourcing/event-sourcing-php.md)
