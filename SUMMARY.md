@@ -59,7 +59,7 @@
   * [Method Invocation](messaging/conversion/method-invocation.md)
   * [Conversion](messaging/conversion/conversion.md)
 * [Service (Application) Configuration](messaging/service-application-configuration.md)
-* [Adding new Module](messaging/adding-new-module.md)
+* [Registering new Module](messaging/registering-new-module.md)
 
 ## Modules
 
