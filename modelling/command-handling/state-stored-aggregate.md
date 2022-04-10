@@ -8,8 +8,8 @@ This chapter will cover the basics on how to implement an [Aggregate](../modelli
 
 ### State-Stored Aggregate
 
-An Aggregate is a regular object, which contains state and methods to alter that state. It can be described as Entity, which carry set of behaviours.   
-When creating the Aggregate object, you are creating the _Aggregate Root_. 
+An Aggregate is a regular object, which contains state and methods to alter that state. It can be described as Entity, which carry set of behaviours. \
+When creating the Aggregate object, you are creating the _Aggregate Root_.&#x20;
 
 ```php
  #[Aggregate] // 1
@@ -48,10 +48,13 @@ class Product
 ```
 
 1. `Aggregate` tells Ecotone, that this class should be registered as Aggregate Root.
-2. `AggregateIdentifier` is the external reference point Aggregate. 
+2.  `AggregateIdentifier` is the external reference point Aggregate.&#x20;
 
-   This field tells Ecotone to which Aggregate a given Command is targeted.
+    This field tells Ecotone to which Aggregate a given Command is targeted.\
+    You may also you expose identifier over public method by annotating it with attribute&#x20;
 
+    ```
+    #[AggregateIdentifierMethod("productId")]
+    ```
 3. `CommandHandler` defined on static method acts as _factory method_. Given command it should return _new instance_ of specific aggregate, in that case new Product.
 4. `CommandHandler` defined on non static class method is place where you would put business logic and state changes
-
