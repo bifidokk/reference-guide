@@ -173,7 +173,7 @@ class EcotoneQuickstart
             ["orderId" => $orderId, "productIds" => [1,2]]
         );
 
-        echo $this->queryBus->convertAndSend("order.getTotalPrice", MediaType::APPLICATION_X_PHP_ARRAY, ["orderId" => $orderId]);
+        echo $this->queryBus->sendWithRouting("order.getTotalPrice", ["orderId" => $orderId], MediaType::APPLICATION_X_PHP_ARRAY);
     }
 }
 ```
