@@ -332,10 +332,13 @@ Let's create new class `App\Infrastructure\MessagingConfiguration.`
 ```php
 namespace App\Infrastructure;
 
+use Ecotone\Amqp\AmqpBackedMessageChannelBuilder;
+use Ecotone\Messaging\Attribute\ServiceContext;
+
 class MessagingConfiguration
 {
     #[ServiceContext]
-    public function orderChannel()
+    public function orderChannel() : array
     {
         return [
             AmqpBackedMessageChannelBuilder::create("orders")
